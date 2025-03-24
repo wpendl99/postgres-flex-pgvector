@@ -82,6 +82,27 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     haproxy=$HAPROXY_VERSION.\* \
     && apt autoremove -y && apt clean
 
+# Install Git for cloning pgvector
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git \
+    curl \
+    libpq-dev \
+    postgresql-server-dev-all
+
+# Install pgvector extension
+RUN cd /tmp && \
+    git clone --branch v0.8.0 https://github.com/pgvector/pgvector.git && \
+    cd pgvector && \
+    make && \
+    make install
+
+# Clean up unnecessary files and dependencies
+RUN apt-get remove -y build-essential git curl libpq-dev postgresql-server-dev-all && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/*
+
 # Copy Go binaries from the builder stage
 COPY --from=builder /fly/bin/* /usr/local/bin
 
