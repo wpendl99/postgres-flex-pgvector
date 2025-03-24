@@ -1,0 +1,22 @@
+# Use the official PostgreSQL image as the base
+# Apparently, my dev environment uses PostgreSQL 17.1, so we will use that here
+ARG POSTGRES_VERSION=17.1 
+FROM postgres:${POSTGRES_VERSION}
+
+# Install required packages and tools
+RUN apt-get update && \
+    apt-get install -y git make gcc postgresql-server-dev-17 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Clone and install pgvector
+RUN cd /tmp && \
+    git clone --branch v0.8.0 https://github.com/pgvector/pgvector.git && \
+    cd pgvector && \
+    make && \
+    make install
+
+# Clean up
+RUN rm -rf /tmp/pgvector
+
+# Expose the PostgreSQL port
+EXPOSE 5432
