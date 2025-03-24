@@ -36,6 +36,15 @@ processes = []
     timeout = "10s"
     type = "http"
 
+[[services]]
+  internal_port = 5432 # Postgres instance
+  protocol = "tcp"
+
+[[services.ports]]
+  handlers = ["pg_tls"]
+  port = 5432
+
+
 [[mounts]]
   destination = "/data"
   source = "pg_data"
